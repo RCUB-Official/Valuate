@@ -63,3 +63,14 @@ a:hover {
 #footer {
     font-size:15px;
 }
+
+/* Valuate custom */
+
+#logo img {
+    height:50px;
+}
+
+.logo-text {
+    top:20%;
+    margin-left: 5px;
+}

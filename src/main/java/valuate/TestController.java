@@ -1,4 +1,4 @@
-package beans;
+package valuate;
 
 import framework.EventHandler;
 import javax.faces.bean.ManagedBean;

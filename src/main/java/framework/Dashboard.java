@@ -3,7 +3,7 @@ package framework;
 import framework.diagnostics.Monitorable;
 import framework.database.ConnectionPool;
 import framework.diagnostics.Status.State;
-import framework.settings.RestlessSettings;
+import framework.settings.ValuateSettings;
 import framework.settings.DatabaseSettings;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public final class Dashboard implements Serializable {
     private void formChain() {  // Ensures the proper order of initialization
         monitorables.add(DatabaseSettings.getInstance());
         monitorables.add(ConnectionPool.getInstance());
-        monitorables.add(RestlessSettings.getInstance());
+        monitorables.add(ValuateSettings.getInstance());
     }
 
     @PostConstruct

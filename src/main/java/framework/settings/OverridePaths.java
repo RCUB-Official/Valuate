@@ -16,7 +16,7 @@ class OverridePaths {
 
     // TODO: list all properties paths that can be overriden
     private String databaseSettings;
-    private String restlessSettings;
+    private String valuateSettings;
 
     private OverridePaths() {
         Properties properties = new Properties();
@@ -24,7 +24,7 @@ class OverridePaths {
             properties.load(istream);
 
             // TODO: read override paths
-            restlessSettings = properties.getProperty("restless");
+            valuateSettings = properties.getProperty("valuate");
             databaseSettings = properties.getProperty("database");
 
         } catch (IOException ex) {
@@ -37,8 +37,8 @@ class OverridePaths {
     }
 
     // TODO: generate getters for all override paths
-    public String getRestlessSettings() {
-        return restlessSettings;
+    public String getValuateSettings() {
+        return valuateSettings;
     }
 
     public String getDatabaseSettings() {
