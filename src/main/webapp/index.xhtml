@@ -3,15 +3,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:body>
         <ui:composition template="/WEB-INF/facelets/template.xhtml">
             <ui:param name="page" value="index" />
+            <ui:param name="authorized" value="#{user.authenticated}"/>
 
-            <ui:define name="title">RestlessFramework - Page Title</ui:define>
+            <ui:define name="title">
+                <c:choose>
+                    <c:when test="#{!dashboard.operational}">
+                        Valuate - Malfunction
+                    </c:when>
+                    <c:when test="#{user.authenticated}">
+                        Valuate - My Sites
+                    </c:when>
+                    <c:otherwise>
+                        Valuate
+                    </c:otherwise>
+                </c:choose>
+            </ui:define>
 
             <ui:define name="page_icon"><i class="fa fa-fw fa-flag"/></ui:define>
 
+            <!--
             <ui:define name="sidebar">
                 <div id="sidebar" class="col-lg-2">
                     <h:form>
@@ -27,10 +43,77 @@
                     </h:form>
                 </div>
             </ui:define>
+            -->
 
+            <ui:define name="regular_content">
+                <p:panel header="Add a new site" styleClass="spaced-bottom"
+                         toggleable="true" collapsed="false">
+                    <h:form id="addSiteForm">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <h:outputLabel for="newSiteName" value="Site name"/>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel for="newSiteUrlPrefix" value="URL prefix"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <p:inputText id="newSiteName" value="#{siteController.toBeAddedSiteName}"
+                                             placeholder="My Website's Title"/>
+                            </div>
+                            <div class="col-lg-3">
+                                <p:inputText id="newSiteUrlPrefix" value="#{siteController.toBeAddedUrlPrefix}"
+                                             placeholder="https://mywebsite.com/path/"/>
+                            </div>
+                            <div class="col-lg-3">
+                                <p:commandButton value="Add New Site" icon="fa fa-fw fa-plus"
+                                                 action="#{siteController.addNewSite()}" update="@form siteTableForm"/>
+                            </div>
+                        </div>
+                    </h:form>
+                </p:panel>
 
-            <ui:define name="content">
-                <p>"A good plan violently executed now is better than a perfect plan executed next week."<br/>General George S. Patton</p>
+                <div class="row">
+                    <h:form id="siteTableForm" styleClass="col-lg-12">
+                        <p:dataTable value="#{siteController.sites}" var="siteRow">
+                            <f:facet name="header">My sites</f:facet>
+                            <p:column headerText="Site name">
+                                <p:link outcome="site">
+                                    <f:param name="site_id" value="#{siteRow.id}"/>
+                                    #{siteRow.name}</p:link>
+                            </p:column>
+                            <p:column headerText="Prefixes">
+                                <ul>
+                                    <p:repeat value="#{siteRow.prefixes}" var="prefixRow">
+                                        <li>#{prefixRow}</li>
+                                    </p:repeat>
+                                </ul>
+                            </p:column>
+                            <p:column width="50">
+                                <p:commandLink action="#{siteRow.delete()}" update="@form">
+                                    <span class="fa fa-2x fa-trash"/>
+                                    <p:confirm header="Confirm deletion" message="Do you want to delete #{siteRow.name}?" icon="fa fa-trash"/>
+                                </p:commandLink>
+                            </p:column>
+                        </p:dataTable>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                        </p:confirmDialog>
+                    </h:form>
+                </div>
+
+            </ui:define>
+
+            <ui:define name="not_authorized">
+                VALUATE INTRO<br/>
+                LINK to register page
+            </ui:define>
+
+            <ui:define name="malfunction">
+                <h3>Malfunction!</h3>
             </ui:define>
 
         </ui:composition>

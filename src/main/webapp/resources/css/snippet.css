@@ -1,51 +1,124 @@
-#valuate {
-    width: 500px;
+valuate {   /* Just the valuate element*/
+    display:inline-block;
+    width: 600px;
     background-color:#fafafa;
     border:1px solid #ccc;
-    padding:4px 10px;
     border-radius:7px;
     overflow:hidden;
+    font-family: Graphik LCG Web, Graphik Arabic Web Regular, -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, Lucida Grande, Sans-Serif;
 }
 
-#valuate_close {
+
+/* Valuate Header */
+
+.title-cell, .close-cell {
+    border-bottom: 1px solid #ddd;
+}
+
+.title-cell {
+    width:100%;
+    padding:10px;
+    text-align: left;
+}
+
+.close-cell {
+    padding-right:5px;
+    text-align: right;
+}
+
+.valuate-close {
     border:none;
     background-color:inherit;
     color:#000;
-    text-align:center;
     text-decoration: none;
-    display: inline-block;
-    font-size:22px;
-    float:right;
+    font-size:30px;
 }
 
-#valuate_close:focus, #valuate_close:hover {
+.valuate-close:focus, .valuate-close:hover {
     color:#ff0000;
 }
 
-#valuate_lowest, #valuate_highest {
+
+/* Question & Logo Area */
+
+.valuate-question {
+    width:100%;
+    text-align: left;
+    margin-bottom:5px;
+    padding:20px;
+    border-bottom:1px solid #ddd;
+}
+
+.valuate-logo, .user-logo {
+    height:50px;
+    padding:10px;
+}
+
+/* Emoji Area */
+
+.valuate-emoticons {
+    width:100%;
+}
+
+.valuate-emoticons img {
+    height:55px;
+}
+
+.valuate-emoticon-cell {
+    width:25px;
+}
+
+.valuate-emoticons img:hover, .valuate-emoticons img:focus {
+    background-color: #ddd;
+    border-radius:14px;
+}
+
+.valuate-emoticons img[selected] {
+    background:#fff;
+    border-radius:14px;
+    border:2px solid #ddd;
+}
+
+
+/* Leftmost/Rightmost Explanations */
+
+.valuate-explanations {
+    width:100%;
+    margin-top:15px;
+    margin-bottom:50px;
+}
+
+.valuate-lowest, .valuate-highest {
+    width:45%;
+}
+
+.valuate-lowest {
     float:left;
-    width:20%;
+    padding-left:10px;
+    text-align:left;
 }
 
-#valuate_emoticons {
-    float:left;
-    width:60%;
+.valuate-highest {
+    float:right;
+    padding-right:10px;
+    text-align:right;
 }
 
-#valuate_emoticons img {
-    padding-right:5px;
-    padding-left:5px;
-    height:45px;
-}
 
-#valuate_comment {
-    max-width: 99%;
-    width:99%;
+/* Comment Text Area */
+
+.valuate-comment {
+    max-width: 98%;
+    width:98%;
+    min-height: 100px;
     height:100px;
+    margin:1%;
 }
 
-#valuate_submit {
-    border:none;
+/* Submit button */
+
+.valuate-submit {
+    border:1px solid #000;
     background-color:#4caf50;
     color:#fff;
     margin-top:5px;
@@ -54,50 +127,30 @@
     text-decoration: none;
     display: inline-block;
     font-size:16px;
-    float:left;
+    float:right;
+    margin:7px;
 }
 
-#valuate_submit:focus, #valuate_submit:hover {
+.valuate-submit:focus, .valuate-submit:hover {
     background-color:#357a38;
 }
 
-#valuate_submit:disabled {
+.valuate-submit:disabled {
     background-color:#ddd;
 }
 
-#valuate_question {
-    width:100%;
-    text-align: left;
-    margin-bottom:5px;
-    padding:5px;
-    border-bottom:1px solid #ddd;
+
+/* User ID Area */
+
+.valuate-user-id {
+    margin: 7px;
 }
 
-#valuate_logo_area {
-    width:92%;
-    overflow:hidden;
+.valuate-checkbox {
+    margin-right: 10px;
 }
 
-#valuate_logo_area img {
-    height:50px;
-}
-
-#valuate_logo {
-    float:left;
-}
-
-#user_logo {
-    float:right;
-}
-
-.valuate_selected_grade {
-    background:#fff;
-    border-radius:14px;
-    border:2px solid #ddd;
-    box-shadow: 1px 1px #bbb;
-}
-
-#valuate_submit_message {
-    margin-top: 10px;
-    font-size: 18px;
+.valuate-sent {
+    border:none;
+    background:none;
 }

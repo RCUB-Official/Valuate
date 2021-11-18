@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:body>
+        <ui:composition template="/WEB-INF/facelets/template.xhtml">
+            <ui:param name="page" value="site" />
+            <ui:param name="authorized" value="#{user.authenticated}"/>
+
+            <ui:define name="title">
+                <c:choose>
+                    <c:when test="#{!dashboard.operational}">
+                        Malfunction
+                    </c:when>
+                    <c:when test="#{user.authenticated and siteController.site == null}">
+                        Valuate - My Sites
+                    </c:when>
+                    <c:otherwise>
+                        Valuate - #{siteController.site.name}
+                    </c:otherwise>
+                </c:choose>
+            </ui:define>
+
+            <ui:define name="page_icon"><i class="fa fa-fw fa-folder"/></ui:define>
+
+            <ui:define name="regular_content">
+
+                <p:panel header="Basic data" styleClass="spaced-bottom">
+                    <h:form id="basicDataForm">
+                        <div class="row spaced-bottom">
+                            <div class="col-lg-6">
+                                <h:outputLabel for="editName" value="Name"/><br/>
+                                <p:inputText id="editName" value="#{siteController.site.name}"/>
+                                <p:commandButton value="Update" icon="fa fa-fw fa-save"
+                                                 action="#{siteController.site.changeName()}" update="@form"/>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel for="createdDate" value="Created"/><br/>
+                                <h:outputText id="createdDate" value="#{siteController.site.created}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm"/>
+                                </h:outputText>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel for="modifiedDate" value="Modified"/><br/>
+                                <h:outputText id="modifiedDate" value="#{siteController.site.modified}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm"/>
+                                </h:outputText>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <h:outputLabel for="spamProtect" value="Spam Protection"/><br/>
+                                <p:selectBooleanButton id="spamProtect" value="#{siteController.site.spamProtect}" styleClass="spaced-bottom"
+                                                       offLabel="Disabled" onLabel="Enabled"
+                                                       onIcon="fa fa-fw fa-toggle-on" offIcon="fa fa-fw fa-toggle-off">
+                                    <p:ajax event="change" update="@form"/>
+                                </p:selectBooleanButton>
+                                <p:tooltip for="spamProtect">Disable if you want to send HTTP requests directly to the Valuate API,<br/>without using the JavaScript provided in the snippet.</p:tooltip>
+                            </div>
+                        </div>
+                    </h:form>
+                </p:panel>
+
+                <p:panel header="URL prefixes" styleClass="spaced-bottom">
+                    <h:form id="prefixForm">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <p:repeat value="#{siteController.site.prefixes}" var="prefixRow">
+                                    <div class="row prefix-row">
+                                        <div class="col-lg-10">
+                                            #{prefixRow}
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <p:commandLink action="#{siteController.site.deletePrefix(prefixRow)}" update="@form basicDataForm"
+                                                           disabled="#{siteController.site.prefixes.size() == 1}">
+                                                <span class="fa fa-fw fa-trash"/>
+                                            </p:commandLink>
+                                        </div>
+                                    </div>
+                                </p:repeat>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <h:outputLabel for="addPrefix" value="Add a new prefix"/><br/>
+                                <p:inputText id="addPrefix" value="#{siteController.site.toBeAddedPrefix}" placeholder="https://mysite.com"/>
+                                <p:commandButton id="addPrefixButton" value="Add" icon="fa fa-fw fa-plus"
+                                                 action="#{siteController.site.addPrefix()}" update="@form basicDataForm growl"/>
+                            </div>
+                        </div>
+                    </h:form>
+                </p:panel>
+
+            </ui:define>
+
+            <ui:define name="not_authorized">
+                <h3>Access Denied!</h3>
+            </ui:define>
+
+            <ui:define name="malfunction">
+                <h3>Malfunction!</h3>
+            </ui:define>
+
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -33,6 +33,10 @@ body {
     opacity: .98;
 }
 
+.navbar-inverse {
+    min-height:80px;
+}
+
 .ui-growl-message {
     width: 180px;
 }

@@ -1,4 +1,4 @@
-package valuate.servlets;
+package valuate.api.servlets;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import valuate.Feedback;
 
 public class Endpoint extends HttpServlet {
 
@@ -25,13 +26,24 @@ public class Endpoint extends HttpServlet {
 
         try (InputStream inputStream = request.getInputStream();) {
             JSONParser parser = new JSONParser();
-            JSONObject parsedObject = (JSONObject) parser.parse(new InputStreamReader(inputStream));
+            JSONObject po = (JSONObject) parser.parse(new InputStreamReader(inputStream));
 
-            LOG.info("Received feedback " + (String) parsedObject.get("comment") + " graded: " + (long) parsedObject.get("grade"));
+            Feedback feedback = new Feedback(Long.parseLong((String) po.get("siteId")),
+                    (String) po.get("questionId"),
+                    (String) po.get("fullUrl"),
+                    (String) po.get("question"),
+                    (String) po.get("lowest"),
+                    (String) po.get("highest"),
+                    (Long) po.get("grade"),
+                    (String) po.get("comment"),
+                    (String) po.get("valuatorId"),
+                    (String) po.get("reference"));
+
+            // TODO: validate fullUrl against the recently requested site IDs.
+            LOG.info("Received feedback " + feedback);
         } catch (ParseException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
 
-        
     }
 }

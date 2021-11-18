@@ -9,7 +9,7 @@
         <ui:composition template="/WEB-INF/facelets/template.xhtml">
             <ui:param name="page" value="dashboard" />
 
-            <ui:define name="title">Restless Framework - Dashboard</ui:define>
+            <ui:define name="title">Valuate - Dashboard</ui:define>
 
             <ui:define name="page_icon">
                 <c:choose>
@@ -30,8 +30,8 @@
                                 <ui:repeat value="#{dashboard.monitorables}" var="monitorable" varStatus="iterator">
                                     <div class="col-lg-3 dashboard #{monitorable.status.state}">
                                         <label>#{monitorable.label}</label><br/>
-                                        <p:commandButton value="#{monitorable.status.uninitialized ? 'Initialize' : 'Reload'}" icon="#{monitorable.status.uninitialized ? 'fa fa-start' : 'fa fa-refresh'}"
-                                                         action="#{monitorable.reload()}" update="@all"/>
+                                        <p:commandButton value="#{monitorable.status.uninitialized ? 'Initialize' : 'Reload'}" icon="#{monitorable.status.uninitialized ? 'fa fa-play' : 'fa fa-refresh'}"
+                                                         action="#{monitorable.reload()}" update="@form"/>
                                         <small>
                                             <p:commandButton type="button" title="Malfunction" id="malfunction" icon="fa fa-fw fa-warning" rendered="#{monitorable.status.malfunction}"/>
                                         </small>

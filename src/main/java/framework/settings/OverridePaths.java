@@ -14,7 +14,7 @@ class OverridePaths {
 
     private final String path = "/config/overrides.properties";
 
-    // TODO: list all properties paths that can be overriden
+    private String adminGods;
     private String databaseSettings;
     private String valuateSettings;
 
@@ -24,8 +24,9 @@ class OverridePaths {
             properties.load(istream);
 
             // TODO: read override paths
-            valuateSettings = properties.getProperty("valuate");
+            adminGods = properties.getProperty("auxiliary-auth");
             databaseSettings = properties.getProperty("database");
+            valuateSettings = properties.getProperty("valuate");
 
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -37,11 +38,16 @@ class OverridePaths {
     }
 
     // TODO: generate getters for all override paths
+    public String getDatabaseSettings() {
+        return databaseSettings;
+    }
+
     public String getValuateSettings() {
         return valuateSettings;
     }
 
-    public String getDatabaseSettings() {
-        return databaseSettings;
+    public String getAdminGods() {
+        return adminGods;
     }
+
 }

@@ -13,28 +13,30 @@ and open the template in the editor.
     <body>
         <ui:composition>
 
+            <c:if test="#{dashboard.operational and user.authenticated}">
+                <li class="#{page == 'index' ? 'active' : null}">
+                    <p:link outcome="index">
+                        <i class="fa fa-fw fa-flag"/>
+                        My Sites
+                    </p:link>
+                </li>
+            </c:if>
 
-            <li class="#{page == 'index' ? 'active' : null}">
-                <p:link outcome="index">
-                    <i class="fa fa-fw fa-flag"/>
-                    Index
-                </p:link>
-            </li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Services</a></li>            
-            <li class="#{page == 'dashboard' ? 'active' : null}">
-                <p:link outcome="dashboard">
-                    <c:choose>
-                        <c:when test="#{dashboard.operational}">
-                            <i class="fa fa-fw fa-tachometer"/>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="fa fa-fw fa-warning"/>
-                        </c:otherwise>
-                    </c:choose>
-                    Dashboard
-                </p:link>
-            </li>
+            <c:if test="#{user.god}">
+                <li class="#{page == 'dashboard' ? 'active' : null}">
+                    <p:link outcome="dashboard">
+                        <c:choose>
+                            <c:when test="#{dashboard.operational}">
+                                <i class="fa fa-fw fa-tachometer"/>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="fa fa-fw fa-warning"/>
+                            </c:otherwise>
+                        </c:choose>
+                        Dashboard
+                    </p:link>
+                </li>
+            </c:if>
         </ui:composition>
     </body>
 </html>

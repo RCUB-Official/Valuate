@@ -5,6 +5,7 @@ import framework.database.ConnectionPool;
 import framework.diagnostics.Status.State;
 import framework.settings.ValuateSettings;
 import framework.settings.DatabaseSettings;
+import framework.settings.AuxiliaryAuth;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,7 @@ public final class Dashboard implements Serializable {
     }
 
     private void formChain() {  // Ensures the proper order of initialization
+        monitorables.add(AuxiliaryAuth.getInstance());
         monitorables.add(DatabaseSettings.getInstance());
         monitorables.add(ConnectionPool.getInstance());
         monitorables.add(ValuateSettings.getInstance());

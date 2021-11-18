@@ -11,11 +11,11 @@
     </servlet>
     <servlet>
         <servlet-name>Endpoint</servlet-name>
-        <servlet-class>valuate.servlets.Endpoint</servlet-class>
+        <servlet-class>valuate.api.servlets.Endpoint</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ScriptServer</servlet-name>
-        <servlet-class>valuate.servlets.ScriptServer</servlet-class>
+        <servlet-class>valuate.api.servlets.ScriptServer</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
