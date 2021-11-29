@@ -24,7 +24,7 @@
 
             <ui:define name="content">
                 <c:choose>
-                    <c:when test="#{user.authenticated}"> <!-- TODO: Change with actual administrator test -->
+                    <c:when test="#{user.authenticated and user.god}"> <!-- TODO: Change with actual administrator test -->
                         <h:form>
                             <div class="row">
                                 <ui:repeat value="#{dashboard.monitorables}" var="monitorable" varStatus="iterator">

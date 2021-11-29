@@ -93,9 +93,10 @@ public class SiteServer {
             stmt.setLong(1, id);
             ResultSet result = stmt.executeQuery();
             if (result.next()) {
-                site = new Site(id, result.getString("site_name"), result.getBoolean("spam_protect"),
+                site = new Site(id, result.getInt("user_id"), result.getString("site_name"), result.getBoolean("spam_protect"),
                         new Date(result.getTimestamp("created").getTime()), new Date(result.getTimestamp("modified").getTime()),
                         getSitePrefixes(id, connection));
+                site.setQuestions(QuestionServer.getQuestions(connection, id));
             }
         } catch (SQLException | InterruptedException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -115,9 +116,10 @@ public class SiteServer {
             stmt.setInt(1, userId);
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                Site site = new Site(result.getLong("site_id"), result.getString("site_name"), result.getBoolean("spam_protect"),
+                Site site = new Site(result.getLong("site_id"), result.getInt("user_id"), result.getString("site_name"), result.getBoolean("spam_protect"),
                         new Date(result.getTimestamp("created").getTime()), new Date(result.getTimestamp("modified").getTime()),
                         getSitePrefixes(result.getLong("site_id"), connection));
+                site.setQuestions(QuestionServer.getQuestions(connection, site.getId()));
                 sites.add(site);
             }
         } catch (SQLException | InterruptedException ex) {

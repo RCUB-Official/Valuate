@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:body>
+        <ui:composition template="/WEB-INF/facelets/template.xhtml">
+            <ui:param name="page" value="site" />
+            <ui:param name="authorized" value="#{user.authenticated}"/>
+
+            <ui:define name="title">
+                Valuate - Report for "B-Chart Base"
+            </ui:define>
+
+            <ui:define name="regular_content">
+                <h3 class="spaced-bottom">What do you think about our online service and app?</h3>
+                <h4>Asked on 2021-10-01, 15:30.</h4>
+
+                <p:panelGrid styleClass="spaced-bottom">
+                    <p:row>
+                        <p:column>
+                            <b>Grade from</b>
+                        </p:column>
+                        <p:column>
+                            <b>Average grade</b>
+                        </p:column>
+                        <p:column>
+                            <b>Grade to</b>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            1 - Terrible
+                        </p:column>
+                        <p:column>
+                            3.2
+                        </p:column>
+                        <p:column>
+                            5 - Excellent
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+
+                <p:panelGrid styleClass="spaced-bottom">
+                    <p:row>
+                        <p:column colspan="5">
+                            <b>Average grade by month</b>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            2021 - November
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="4.3" style="float:right"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            2021 - October
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="2.5" style="float:right"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+
+                <h:form>
+                    <p:selectBooleanCheckbox disabled="true"/> Only comments<br/>
+                    <p:selectBooleanCheckbox disabled="true"/> Client details
+                </h:form>
+
+                <p:dataTable value="#{mockReportController.reports}" var="report">
+                    <p:column headerText="Time received" width="15%">
+                        <h:outputText id="modifiedDate" value="#{report.received}">
+                            <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Valuator ID">
+                        <h:outputText value="#{report.username}" rendered="#{not empty report.username}"/>
+                    </p:column>
+                    <p:column headerText="From" width="20%">
+                        <small>
+                            #{report.ipAddress} <img src="https://www.countryflagicons.com/FLAT/32/#{report.country}.png"/><br/>
+                            #{report.userAgent}
+                        </small>
+                    </p:column>
+                    <p:column headerText="Reference">
+                        -
+                    </p:column>
+                    <p:column headerText="Grade" width="10%">
+                        #{report.grade}
+                    </p:column>
+
+                    <p:column headerText="Comment" width="30%">
+                        #{report.comment}
+                    </p:column>
+                </p:dataTable>
+
+            </ui:define>
+
+            <ui:define name="not_authorized">
+                <h3>Access Denied!</h3>
+            </ui:define>
+
+            <ui:define name="malfunction">
+                <h3>Malfunction!</h3>
+            </ui:define>
+
+        </ui:composition>
+    </h:body>
+</html>
+

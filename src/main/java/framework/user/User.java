@@ -131,6 +131,14 @@ public class User implements Serializable {
         return authenticated;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public boolean isAdministrator() {
+        return administrator;
+    }
+
     public String getName() {
         return name;
     }

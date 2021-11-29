@@ -1,5 +1,6 @@
 package valuate.api.site;
 
+import framework.EventHandler;
 import framework.user.User;
 import framework.utilities.Utilities;
 import java.io.Serializable;
@@ -64,9 +65,15 @@ public class SiteController implements Serializable {
     }
 
     public String addNewSite() {
-        long siteId = SiteServer.addNewSite(1, toBeAddedSiteName, toBeAddedUrlPrefix);
-        sites = SiteServer.getSitesForUser(userId);
-        return "site?site_id=" + siteId + "&faces-redirect=true";
+        User user = (User) Utilities.getObject("#{user}");
+        long siteId = SiteServer.addNewSite(user.getId(), toBeAddedSiteName, toBeAddedUrlPrefix);
+        if (siteId != -1) {
+            sites = SiteServer.getSitesForUser(userId);
+            return "site?site_id=" + siteId + "&faces-redirect=true";
+        } else {
+            EventHandler.alertUserError("Failed to add a site", "Check the logs to debug this issue.");
+            return "index";
+        }
     }
 
 }

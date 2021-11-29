@@ -12,6 +12,7 @@ public final class Site {
     private static final Logger LOG = Logger.getLogger(Site.class.getName());
 
     private final long id;
+    private final int ownerId;
 
     private String name;
     private boolean spamProtect;
@@ -22,8 +23,11 @@ public final class Site {
     private final List<String> prefixes;
     private String toBeAddedPrefix = "";
 
-    Site(long id, String name, boolean spamProtect, Date created, Date modified, List<String> prefixes) {
+    private List<Question> questions = null;
+
+    Site(long id, int ownerId, String name, boolean spamProtect, Date created, Date modified, List<String> prefixes) {
         this.id = id;
+        this.ownerId = ownerId;
         this.name = name;
         this.spamProtect = spamProtect;
         this.created = created;
@@ -33,6 +37,10 @@ public final class Site {
 
     public long getId() {
         return id;
+    }
+
+    public int getOwnerId() {
+        return ownerId;
     }
 
     public String getName() {
@@ -114,6 +122,14 @@ public final class Site {
             SiteServer.changeName(id, name);
             modified = new Date(System.currentTimeMillis());
         }
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    void setQuestions(List<Question> questions) {
+        this.questions = questions;
     }
 
     public void delete() {

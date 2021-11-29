@@ -9,7 +9,7 @@
     <h:body>
         <ui:composition template="/WEB-INF/facelets/template.xhtml">
             <ui:param name="page" value="site" />
-            <ui:param name="authorized" value="#{user.authenticated}"/>
+            <ui:param name="authorized" value="#{user.authenticated and user.id == siteController.site.ownerId}"/>
 
             <ui:define name="title">
                 <c:choose>
@@ -93,6 +93,24 @@
                         </div>
                     </h:form>
                 </p:panel>
+
+                <h:form id="questionsForm">
+                    <h4>Questions</h4>
+                    <p:repeat value="#{siteController.site.questions}" var="question">
+                        <p:panel header="#{question.questionText}">
+                            <p:inputText value="#{question.questionId}"/>
+
+                            <p:inputText value="#{question.getAttribute('lowest').value}"/>
+                        </p:panel>
+                        <ul>
+                            <p:repeat value="#{question.attributes}" var="attributeId">
+                                <li>#{attributeId}</li>
+                            </p:repeat>
+                        </ul>
+                    </p:repeat>
+                </h:form>
+
+                <p:link outcome="report">View Report</p:link>
 
             </ui:define>
 

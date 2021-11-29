@@ -1,6 +1,9 @@
 BEGIN;
 
+DROP TABLE IF EXISTS feedback_attribute_value;
 DROP TABLE IF EXISTS valuate_feedback;
+DROP TABLE IF EXISTS snippet_attribute_value;
+DROP TABLE IF EXISTS snippet_attribute;
 DROP TABLE IF EXISTS valuate_question;
 DROP TABLE IF EXISTS site_url_prefix;
 DROP TABLE IF EXISTS valuate_site;
@@ -31,40 +34,66 @@ CREATE TABLE valuate_site (
 
 CREATE TABLE site_url_prefix (
     site_id BIGINT NOT NULL REFERENCES valuate_site(site_id) ON DELETE CASCADE,
-    url_prefix TEXT UNIQUE NOT NULL,
+    url_prefix TEXT NOT NULL,
     PRIMARY KEY (site_id, url_prefix)
 );
 
 CREATE TABLE valuate_question (
     site_id BIGINT NOT NULL REFERENCES valuate_site(site_id) ON DELETE CASCADE,
-    question_id VARCHAR(32), -- hex-encoded md5(question_text)
+    question_id VARCHAR(32) NOT NULL, -- hex-encoded md5(question_text)
     lock BOOLEAN NOT NULL DEFAULT false,
     question_text TEXT NOT NULL,
-    lowest VARCHAR(40),
-    highest VARCHAR(40),
-    emoji_set_id VARCHAR(20) NOT NULL DEFAULT 'bw',
-    user_logo_url TEXT,
-    user_url TEXT,
     user_note TEXT,
     PRIMARY KEY (site_id, question_id)
 );
 
-CREATE TABLE valuate_feedback (
-    feedback_id BIGSERIAL PRIMARY KEY,
+CREATE TABLE snippet_attribute (
+    attribute_id VARCHAR(256) PRIMARY KEY, -- attribute name in the HTML
+    provided_by_feedback BOOLEAN NOT NULL DEFAULT false,
+    default_value TEXT DEFAULT NULL,
+    admin_note TEXT DEFAULT NULL
+);
+
+INSERT INTO snippet_attribute (attribute_id, admin_note) VALUES ('user-logo', 'URL to the branding image.');
+INSERT INTO snippet_attribute (attribute_id, admin_note) VALUES ('user-link', 'Link to the user''s website.');
+INSERT INTO snippet_attribute (attribute_id, admin_note) VALUES ('title', 'Title of the valuate window.');
+INSERT INTO snippet_attribute (attribute_id, admin_note) VALUES ('lowest', 'Meaning of the lowest (leftmost) value.');
+INSERT INTO snippet_attribute (attribute_id, admin_note) VALUES ('highest', 'Meaning of the highest (rightmost) value.');
+INSERT INTO snippet_attribute (attribute_id, admin_note, default_value) VALUES ('emoji', 'Identifier of the emoji set.', 'bw');
+
+-- Feedback attributes
+INSERT INTO snippet_attribute (attribute_id, admin_note, provided_by_feedback) VALUES ('valuator-id', 'Username of the valuator, if authenticated.', true);
+INSERT INTO snippet_attribute (attribute_id, admin_note, provided_by_feedback) VALUES ('reference', 'A place for an additional identifier, to be set by the user.', true);
+INSERT INTO snippet_attribute (attribute_id, admin_note, provided_by_feedback) VALUES ('grade', 'Valuator''s grade.', true);
+INSERT INTO snippet_attribute (attribute_id, admin_note, provided_by_feedback) VALUES ('comment', 'Valuator''s comment.', true);
+INSERT INTO snippet_attribute (attribute_id, admin_note, provided_by_feedback) VALUES ('full-url', 'Valuator''s comment.', true);
+INSERT INTO snippet_attribute (attribute_id, admin_note, provided_by_feedback) VALUES ('question', 'Question, as seen by the valuator.', true);
+
+
+CREATE TABLE snippet_attribute_value (
     site_id BIGINT NOT NULL,
     question_id VARCHAR(32) NOT NULL,
-    received TIMESTAMP NOT NULL DEFAULT current_timestamp,
-    full_url TEXT NOT NULL,
+    attribute_id VARCHAR(256) NOT NULL,
+    attribute_value TEXT NOT NULL,
+    FOREIGN KEY (site_id, question_id) REFERENCES valuate_question(site_id, question_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (site_id, question_id, attribute_id)
+);
+
+CREATE TABLE valuate_feedback (
+    feedback_id BIGSERIAL PRIMARY KEY,
+    site_id BIGINT NOT NULL,    -- Constant in the javascript
+    question_id VARCHAR(32) NOT NULL,   -- Either provided by the attribute or computed as md5(question_text)
+    received TIMESTAMP NOT NULL DEFAULT current_timestamp,  -- currentTimeMillis when the request is received
     valuator_ip VARCHAR(46) NOT NULL, -- supports ipV6
-    valuator_user_agent TEXT NOT NULL,
-    valuator_id TEXT DEFAULT NULL,  -- client-side username (if authenticated)
-    reference TEXT DEFAULT NULL,    -- client-side whatever
-    question_text TEXT,
-    lowest VARCHAR(40),
-    highest VARCHAR(40),
-    grade INTEGER NOT NULL,
-    comment TEXT,
+    valuator_user_agent TEXT NOT NULL,  -- comes as a http header
     FOREIGN KEY (site_id, question_id) REFERENCES valuate_question(site_id, question_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE feedback_attribute_value (
+    feedback_id BIGSERIAL REFERENCES valuate_feedback(feedback_id) ON DELETE CASCADE,
+    attribute_id VARCHAR(256) REFERENCES snippet_attribute(attribute_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    attribute_value TEXT NOT NULL,
+    PRIMARY KEY (feedback_id, attribute_id)
 );
 
 COMMIT;
