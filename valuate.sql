@@ -22,6 +22,7 @@ CREATE TABLE valuate_user (
     administrator BOOLEAN NOT NULL default false
 );
 
+
 CREATE TABLE valuate_site (
     site_id BIGSERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES valuate_user(user_id) ON DELETE CASCADE,
@@ -32,21 +33,13 @@ CREATE TABLE valuate_site (
     UNIQUE (user_id, site_name)
 );
 
+
 CREATE TABLE site_url_prefix (
     site_id BIGINT NOT NULL REFERENCES valuate_site(site_id) ON DELETE CASCADE,
     url_prefix TEXT NOT NULL,
     PRIMARY KEY (site_id, url_prefix)
 );
 
-CREATE TABLE valuate_question (
-    site_id BIGINT NOT NULL REFERENCES valuate_site(site_id) ON DELETE CASCADE,
-    question_id VARCHAR(32) NOT NULL, -- hex-encoded md5(question_text)
-    lock BOOLEAN NOT NULL DEFAULT false,
-    user_note TEXT,
-    created TIMESTAMP NOT NULL DEFAULT current_timestamp,
-    modified TIMESTAMP NOT NULL DEFAULT current_timestamp,
-    PRIMARY KEY (site_id, question_id)
-);
 
 -- Content of this attribute_field table was originally intended to stored in columns of valuate_question and valuate_feedback tables,
 -- but my superior kept inventing new attributes on daily basis and I didn't want Raymond Boyce and Edgar Codd to roll in their graves,
@@ -78,14 +71,26 @@ INSERT INTO attribute_field (attribute_field_id, admin_note, provided_by_feedbac
 INSERT INTO attribute_field (attribute_field_id, admin_note, provided_by_feedback) VALUES ('full-url', 'Valuator''s comment.', true);
 
 
+CREATE TABLE valuate_question (
+    site_id BIGINT NOT NULL REFERENCES valuate_site(site_id) ON DELETE CASCADE,
+    question_id VARCHAR(32) NOT NULL, -- hex-encoded md5(question_text)
+    lock BOOLEAN NOT NULL DEFAULT false,
+    user_note TEXT,
+    created TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    modified TIMESTAMP NOT NULL DEFAULT current_timestamp,
+    PRIMARY KEY (site_id, question_id) -- I'm not a big fan of composite primary keys either, but this was a compromise solution. The precedent has been set.
+);
+
+
 CREATE TABLE question_attribute (
     site_id BIGINT NOT NULL,
     question_id VARCHAR(32) NOT NULL,
-    attribute_field_id VARCHAR(256) NOT NULL,
+    attribute_field_id VARCHAR(256) REFERENCES attribute_field(attribute_field_id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     attribute_value TEXT NOT NULL,
     FOREIGN KEY (site_id, question_id) REFERENCES valuate_question(site_id, question_id) ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (site_id, question_id, attribute_field_id)
 );
+
 
 CREATE TABLE valuate_feedback (
     feedback_id BIGSERIAL PRIMARY KEY,
@@ -97,9 +102,10 @@ CREATE TABLE valuate_feedback (
     FOREIGN KEY (site_id, question_id) REFERENCES valuate_question(site_id, question_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+
 CREATE TABLE feedback_attribute (
     feedback_id BIGSERIAL REFERENCES valuate_feedback(feedback_id) ON DELETE CASCADE,
-    attribute_field_id VARCHAR(256) REFERENCES attribute_field(attribute_field_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    attribute_field_id VARCHAR(256) REFERENCES attribute_field(attribute_field_id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
     attribute_value TEXT NOT NULL,
     PRIMARY KEY (feedback_id, attribute_field_id)
 );

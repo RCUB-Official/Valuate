@@ -1,19 +1,29 @@
-## About RestlessFramework
-A lightweight Java WEB (Java 7, JSF 2.2, PrimeFaces 10, Bootstrap 3) template application for starting a project.
-It was named after it's developer, RestlessDevil (inspired by a Serbian turbo folk song) and it has nothing to do with REST API architecture.
+## About Valuate
+An unfinished web application for receiving feedbacks for various web sites, by their users (valuators), using provided code snippets. 
 
 ## Getting started
-Clone this project from Restless Devil's GitHub and import it into your NetBeans or build it using Maven (developed and tested using 3.6).
 
 ```
-cd RePol
-git clone https://github.com/RestlessDevil/RestlessFramework
-cd RestlessFramework
+git clone https://github.com/RestlessDevil/Valuate
+cd Valuate
 mvn package
 ```
 
-## Features
-1. Dashboard (ApplicationScoped) bean which initializes all mission-critical components and shows which one crashed and what Exception it threw. Can also be used for configuration reload without needing to restart the servlet container.
-1. JDBC Connection Pool singleton class (thread-safe)
-2. Settings class that loads all properties-based configuration files and enables overriding them with external properties files (comes handy when the same WAR file needs to be deployed on multiple servers)
-3. Simple but effective Cache for caching objects that take time to build
+## Configuration
+Enter your database credientals and Valuate server url in configuration.properties file
+./src/main/resources/config/configuration.properties
+
+Encode your password in hex(SHA-512) and save it in auxiliary-auth.xml fajl. These user accounts will be automatically inserted into the database as administrators, upon their first login.
+./src/main/resources/config/auxiliary-auth.xml
+
+Both above mentioned configuration files can be overriden by specifying the absolute path to their respective override files (RestlessFramework feature), in overrides.properties file. If the overriden file is properties-type, then the override should contain only those specific property lines that should be overriden (non-overriden lines will have their values from the WAR).
+/src/main/resources/config/overrides.properties
+
+Before deploying the WAR file, make sure you have made the database and initialized it with the valuate.sql script.
+
+## TODO:
+
+1. Implement a user management panel and registration page (until then, you need to insert them manually into the database)
+2. Implement report-view page instead of the mock one - use caching if it is too slow and use feedback received event to invalidate the cache.
+3. Implement an attribute field management page.
+4. Enforce additional anti-spam measures, e.g if site has anti-spam flag enabled, do not accept feedback unless the was a request for JavaScript from the same IP, some time ago...
