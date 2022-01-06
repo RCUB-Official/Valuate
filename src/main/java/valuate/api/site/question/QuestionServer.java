@@ -12,11 +12,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import valuate.api.attribute.AttributeField;
 import valuate.api.attribute.AttributeServer;
+import valuate.api.feedback.Feedback;
 
 public class QuestionServer {
 
     private static final Logger LOG = Logger.getLogger(QuestionServer.class.getName());
+
+    public static boolean questionExists(long siteId, String questionId) {
+        boolean exists = false;
+
+        ConnectionPool pool = ConnectionPool.getInstance();
+        Connection connection = null;
+        try {
+            connection = pool.getConnection();
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM valuate_question WHERE site_id=? AND question_id=?");
+            stmt.setLong(1, siteId);
+            stmt.setString(2, questionId);
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {    // Question is already known in the database.
+                exists = true;
+            }
+        } catch (SQLException | InterruptedException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            pool.returnConnection(connection);
+        }
+
+        return exists;
+    }
 
     static Question addQuestion(long siteId, String questionId, String questionText) {  // Add by user, manually
         Question question = null;
@@ -57,6 +82,46 @@ public class QuestionServer {
             pool.returnConnection(connection);
         }
         return question;
+    }
+
+    public static void addQuestionByFeedback(Feedback feedback) {
+        ConnectionPool pool = ConnectionPool.getInstance();
+        Connection connection = null;
+        try {
+            connection = pool.getConnection();
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO valuate_question(site_id, question_id, lock, user_note) "
+                    + "VALUES(?, ?, false, 'Added automatically upon receiving a feedback.')");
+            long siteId = feedback.getOriginId();
+            String questionId = feedback.getQuestionId();
+
+            stmt.setLong(1, siteId);
+            stmt.setString(2, questionId);
+            stmt.executeUpdate();
+
+            Map<String, Attribute> attributes = feedback.getAttributes();
+
+            for (String key : attributes.keySet()) {
+                AttributeField field = AttributeServer.getAttributeField(key);
+                if (field != null) {    // Must check, because it came by HTTP request
+                    if (field.isInSnippetEditor()) {    // Only if it belongs to the snippet_editor (question_attribute table).
+                        stmt = connection.prepareStatement("INSERT INTO question_attribute(site_id, question_id, attribute_field_id, attribute_value) "
+                                + "VALUES(?, ?, ?, ?)");
+                        stmt.setLong(1, siteId);
+                        stmt.setString(2, questionId);
+                        stmt.setString(3, key);
+                        stmt.setString(4, attributes.get(key).getValue());
+                        stmt.executeUpdate();
+                    }
+                }
+
+            }
+
+            LOG.log(Level.INFO, "Added a question for site {0} with question_id \"{1}\".", new Object[]{siteId, questionId});
+        } catch (SQLException | InterruptedException ex) {
+            Logger.getLogger(QuestionServer.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            pool.returnConnection(connection);
+        }
     }
 
     public static List<Question> getQuestions(long siteId) {
@@ -111,23 +176,36 @@ public class QuestionServer {
         return question;
     }
 
-    public static void updateQuestionByFeedback(long siteId, String questionId, Map<String, Attribute> attributes) {
+    public static void updateAttribute(long siteId, String questionId, String fieldId, String value) {
+        ConnectionPool pool = ConnectionPool.getInstance();
+        Connection connection = null;
+        try {
+            connection = pool.getConnection();
+            PreparedStatement stmt = connection.prepareStatement("UPDATE question_attribute SET attribute_value=? "
+                    + "WHERE site_id=? AND question_id=? AND attribute_field_id=?");
+            stmt.setString(1, value);
+            stmt.setLong(2, siteId);
+            stmt.setString(3, questionId);
+            stmt.setString(4, fieldId);
+            stmt.executeUpdate();
+
+        } catch (SQLException | InterruptedException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        } finally {
+            pool.returnConnection(connection);
+        }
+    }
+
+    public static void updateQuestionByFeedback(Feedback feedback) {
+        long siteId = feedback.getOriginId();
+        String questionId = feedback.getQuestionId();
+
         Question question = getQuestion(siteId, questionId);
         if (question.isUpdateBySnippet()) {
-            boolean update = false; // Assume nothing changed.
-            for (String key : attributes.keySet()) {    // Iterating through feedback's attributes.
-                Attribute current = question.getAttribute(key);
-                if (current != null) {  // Check every attribute of the current question.
-                    if (current.getValue().equals(attributes.get(key).getValue())) {
-                        update = true;
-                        LOG.log(Level.INFO, "Attribute {0} of the question ({1}, \"{2}\") differs. Updating now.", new Object[]{key, siteId, questionId});
-                        break;
-                    }
+            for (String key : feedback.getAttributes().keySet()) {    // Iterating through feedback's attributes.
+                if (AttributeServer.getAttributeField(key).isInSnippetEditor()) {   // But only if it is meant to be in the snipper editor.
+                    updateAttribute(siteId, questionId, key, feedback.getAttributes().get(key).getValue());
                 }
-            }
-            if (update) {
-                // Lock is false, otherwise this wouldn't happen.
-                updateQuestion(siteId, questionId, questionId, false, question.getUserNote(), attributes);
             }
         }
     }

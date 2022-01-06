@@ -21,6 +21,7 @@ import valuate.api.attribute.AttributeField;
 import valuate.api.attribute.AttributeServer;
 import valuate.api.feedback.Feedback;
 import valuate.api.feedback.FeedbackServer;
+import valuate.api.site.SiteServer;
 import valuate.api.site.question.QuestionServer;
 
 public class Endpoint extends HttpServlet {
@@ -69,12 +70,14 @@ public class Endpoint extends HttpServlet {
 
             Feedback feedback = new Feedback(siteId, questionId, valuatorIP, valuatorUserAgent, attributes);
 
-            // Register the feedback, if it passes validations
-            FeedbackServer.registerFeedback(feedback);
+            // Checking if the site exits, quietly ignore if not (endpoint is the place for most validations).
+            if (SiteServer.getSite(siteId) != null) {
+                // Register the feedback, if it passes validations
+                FeedbackServer.registerFeedback(feedback);
 
-            // Update question if the question is not locked
-            QuestionServer.updateQuestionByFeedback(siteId, questionId, attributes);
-
+                // Update question if the question is not locked
+                QuestionServer.updateQuestionByFeedback(feedback);
+            }
         } catch (Exception ex) {    // LOG EVERY TROUBLE!
             LOG.log(Level.SEVERE, null, ex);
         }
