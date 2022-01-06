@@ -2,14 +2,12 @@ package valuate.api.site;
 
 import framework.EventHandler;
 import framework.utilities.Utilities;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 import org.apache.commons.validator.UrlValidator;
 
-public final class Site {
-
-    private static final Logger LOG = Logger.getLogger(Site.class.getName());
+public final class Site implements Serializable {
 
     private final long id;
     private final int ownerId;
@@ -125,11 +123,14 @@ public final class Site {
     }
 
     public List<Question> getQuestions() {
+        if (questions == null) {
+            questions = QuestionServer.getQuestions(id);
+        }
         return questions;
     }
 
-    void setQuestions(List<Question> questions) {
-        this.questions = questions;
+    public void reloadQuestions() {
+        this.questions = QuestionServer.getQuestions(id);
     }
 
     public void delete() {
@@ -139,13 +140,5 @@ public final class Site {
             sc.init();
         }
     }
-    /*
-    public String getSnippet() {
-        return "<script async defer src=\"" + ValuateSettings.getInstance().getUrl() + "/script?for=" + id + "\" onLoad=\"valuateLoad()\"></script>\n"
-                + "<div id=\"valuate\"" + " lowest=\"" + lowest + "\" highest=\"" + highest + " emoji=\"bw\"" + "\n\t"
-                + " user-logo=\"" + userLogo + "\" user-link=\"" + userLink + "\"" + ">\n"
-                + "\t<div id=\"valuate_question\">" + question + "</div>\n"
-                + "</div>";
-    }
-     */
+
 }

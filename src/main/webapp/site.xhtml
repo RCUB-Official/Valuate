@@ -20,7 +20,7 @@
                         Valuate - My Sites
                     </c:when>
                     <c:otherwise>
-                        Valuate - #{siteController.site.name}
+                        Valuate - Site
                     </c:otherwise>
                 </c:choose>
             </ui:define>
@@ -29,8 +29,8 @@
 
             <ui:define name="regular_content">
 
-                <p:panel header="Basic data" styleClass="spaced-bottom">
-                    <h:form id="basicDataForm">
+                <p:panel header="#{siteController.site.name}" styleClass="spaced-bottom">
+                    <h:form id="siteDataForm">
                         <div class="row spaced-bottom">
                             <div class="col-lg-6">
                                 <h:outputLabel for="editName" value="Name"/><br/>
@@ -51,9 +51,32 @@
                                 </h:outputText>
                             </div>
                         </div>
+
                         <div class="row">
-                            <div class="col-lg-4">
-                                <h:outputLabel for="spamProtect" value="Spam Protection"/><br/>
+                            <div class="col-lg-6">
+                                <h:outputLabel for="prefixes" value="Site prefixes"/><br/>
+                                <p:repeat id="prefixes" value="#{siteController.site.prefixes}" var="prefixRow">
+                                    <div class="row prefix-row">
+                                        <div class="col-lg-10">
+                                            #{prefixRow}
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <p:commandLink action="#{siteController.site.deletePrefix(prefixRow)}" update="@form"
+                                                           disabled="#{siteController.site.prefixes.size() == 1}">
+                                                <span class="fa fa-fw fa-trash"/>
+                                            </p:commandLink>
+                                        </div>
+                                    </div>
+                                </p:repeat>
+
+                                <p:inputText id="addPrefix" value="#{siteController.site.toBeAddedPrefix}"
+                                             placeholder="https://mysite.com"/>
+                                <p:commandButton id="addPrefixButton" value="Add prefix" icon="fa fa-fw fa-plus"
+                                                 action="#{siteController.site.addPrefix()}" update="@form growl"/>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <h:outputLabel for="spamProtect" value="Spam protection"/><br/>
                                 <p:selectBooleanButton id="spamProtect" value="#{siteController.site.spamProtect}" styleClass="spaced-bottom"
                                                        offLabel="Disabled" onLabel="Enabled"
                                                        onIcon="fa fa-fw fa-toggle-on" offIcon="fa fa-fw fa-toggle-off">
@@ -61,56 +84,73 @@
                                 </p:selectBooleanButton>
                                 <p:tooltip for="spamProtect">Disable if you want to send HTTP requests directly to the Valuate API,<br/>without using the JavaScript provided in the snippet.</p:tooltip>
                             </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel for="deleteSite" value="Delete site"/><br/>
+                                <p:commandLink id="deleteSite" action="#{siteController.deleteCurrentSite()}">
+                                    <span class="fa fa-2x fa-trash"/>
+                                    <p:confirm header="Confirm deletion" message="Do you want to delete #{siteController.site.name}?" icon="fa fa-trash"/>
+                                </p:commandLink>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                                </p:confirmDialog>
+                            </div>
                         </div>
                     </h:form>
                 </p:panel>
 
-                <p:panel header="URL prefixes" styleClass="spaced-bottom">
-                    <h:form id="prefixForm">
+                <p:panel header="Questions">
+                    <h:form id="addQuestionForm" styleClass="spaced-bottom">
                         <div class="row">
-                            <div class="col-lg-6">
-                                <p:repeat value="#{siteController.site.prefixes}" var="prefixRow">
-                                    <div class="row prefix-row">
-                                        <div class="col-lg-10">
-                                            #{prefixRow}
-                                        </div>
-                                        <div class="col-lg-2">
-                                            <p:commandLink action="#{siteController.site.deletePrefix(prefixRow)}" update="@form basicDataForm"
-                                                           disabled="#{siteController.site.prefixes.size() == 1}">
-                                                <span class="fa fa-fw fa-trash"/>
-                                            </p:commandLink>
-                                        </div>
-                                    </div>
-                                </p:repeat>
+                            <div class="col-lg-7">
+                                <p:outputLabel for="questionText" value="Question text"/><br/>
+                                <p:inputText id="questionText" styleClass="wide-input" value="#{questionController.questionText}"
+                                             placeholder="What do you think about...?"/>
                             </div>
-
-                            <div class="col-lg-6">
-                                <h:outputLabel for="addPrefix" value="Add a new prefix"/><br/>
-                                <p:inputText id="addPrefix" value="#{siteController.site.toBeAddedPrefix}" placeholder="https://mysite.com"/>
-                                <p:commandButton id="addPrefixButton" value="Add" icon="fa fa-fw fa-plus"
-                                                 action="#{siteController.site.addPrefix()}" update="@form basicDataForm growl"/>
+                            <div class="col-lg-5">
+                                <p:outputLabel for="questionIdentifier" value="Question Identifier"/><br/>
+                                <p:inputText id="questionIdentifier" value="#{questionController.questionId}"
+                                             placeholder="my_question_12"/>
+                                <p:commandButton icon="fa fa-fw fa-plus" value="Add question"
+                                                 action="#{questionController.addNewQuestion()}" update="@form questionsForm"/>
                             </div>
                         </div>
                     </h:form>
+
+                    <h:form id="questionsForm">
+                        <p:dataTable value="#{siteController.site.questions}" var="question" rendered="#{not empty siteController.site.questions}">
+                            <f:facet name="header">Questions</f:facet>
+                            <p:column headerText="Question">
+                                <p:link outcome="question">
+                                    <f:param name="site_id" value="#{question.siteId}"/>
+                                    <f:param name="question_id" value="#{question.questionId}"/>
+                                    #{question.getAttribute('question')}
+                                </p:link>
+                            </p:column>
+                            <p:column headerText="Question" width="160">
+                                <h:outputText value="#{question.created}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Modified" width="160">
+                                <h:outputText value="#{question.modified}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column width="50">
+                                <p:commandLink action="#{question.delete()}" update="@form">
+                                    <span class="fa fa-2x fa-trash"/>
+                                    <p:confirm header="Confirm deletion" message="Do you want to delete #{question.getAttribute('question')}?" icon="fa fa-trash"/>
+                                </p:commandLink>
+                            </p:column>
+                        </p:dataTable>
+
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                        </p:confirmDialog>
+                    </h:form>
                 </p:panel>
-
-                <h:form id="questionsForm">
-                    <h4>Questions</h4>
-                    <p:repeat value="#{siteController.site.questions}" var="question">
-                        <p:panel header="#{question.questionText}">
-                            <p:inputText value="#{question.questionId}"/>
-
-                            <p:inputText value="#{question.getAttribute('lowest').value}"/>
-                        </p:panel>
-                        <ul>
-                            <p:repeat value="#{question.attributes}" var="attributeId">
-                                <li>#{attributeId}</li>
-                            </p:repeat>
-                        </ul>
-                    </p:repeat>
-                </h:form>
-
-                <p:link outcome="report">View Report</p:link>
 
             </ui:define>
 

@@ -1,7 +1,6 @@
 const valuateResourcePath = valuateServiceUrl + "/faces/javax.faces.resource";  // valuateServiceUrl is appended as a constant by the servlet.
 const valuateElementName = "valuate";   // Just to make re-branding easier in case of the forking of the project
 const servicePrefix = "valuate_";
-const autoPrefix = "auto_"; // TODO: move to the servlet and read from the config file.
 
 const defaultTitle = "Valuate Feedback";
 
@@ -314,9 +313,10 @@ function valuateSend(id) {
     var data = {};
 
     data.siteId = valuateSiteId; // Appended as a constant by the servlet.
-    data.grade = parseInt(valuate.getAttribute("grade"));
     data.questionId = valuateId.split(servicePrefix)[1];   // Trimming off the local service prefix
 
+    // Setting attributes - everything is String
+    data.grade = valuate.getAttribute("grade");
     data.question = document.getElementById(valuateId + "_question").innerHTML.trim();
     data.comment = document.getElementById(valuateId + "_comment").value;
     data.lowest = document.getElementById(valuateId + "_lowest").innerHTML;

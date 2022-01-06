@@ -1,6 +1,8 @@
 package valuate.api.site;
 
-public class Attribute {
+import java.io.Serializable;
+
+public class Attribute implements Serializable {
 
     private final String id;
     private String value;
@@ -27,9 +29,17 @@ public class Attribute {
         this.value = value;
     }
 
+    public boolean isEmpty() {
+        return ("".equals(value) || value == null);
+    }
+
     @Override
     public String toString() {
-        return id + ":" + value;
+        if (!isEmpty()) {
+            return value;
+        } else {
+            return id;
+        }
     }
 
 }

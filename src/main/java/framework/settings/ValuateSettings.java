@@ -14,6 +14,9 @@ public final class ValuateSettings extends Settings {
     private String clientScript;
     private String url;
 
+    private String questionAttributeFieldId;
+    private String questionIdAutoPrefix;
+
     private ValuateSettings() {
         super("valuate", "/config/configuration.properties", "Valuate Settings", true);
     }
@@ -27,6 +30,8 @@ public final class ValuateSettings extends Settings {
         PropertiesHandler handler = new PropertiesHandler(prefix, path, OverridePaths.getInstance().getValuateSettings());
 
         url = handler.getParam("url");
+        questionAttributeFieldId = handler.getParam("questionAttributeFieldId");
+        questionIdAutoPrefix = handler.getParam("questionIdAutoPrefix");
 
         // Loading client-script
         try (InputStream templateIstream = ValuateSettings.class.getResourceAsStream(scriptPath)) {
@@ -35,6 +40,7 @@ public final class ValuateSettings extends Settings {
 
             // Setting constants
             clientScript = "const valuateServiceUrl=\"" + url + "\";\n";
+            clientScript += "const autoPrefix=\"" + questionIdAutoPrefix + "\";";
 
             String line;
             while ((line = br.readLine()) != null) {
@@ -49,6 +55,14 @@ public final class ValuateSettings extends Settings {
 
     public String getClientScript() {
         return clientScript;
+    }
+
+    public String getQuestionAttributeFieldId() {
+        return questionAttributeFieldId;
+    }
+
+    public String getQuestionIdAutoPrefix() {
+        return questionIdAutoPrefix;
     }
 
 }

@@ -83,11 +83,15 @@ a:hover {
 }
 
 .prefix-row {
-    margin-bottom:5px;
+    margin-bottom:10px;
 }
 
 .spaced-bottom {
     margin-bottom: 20px;
+}
+
+spaced-top {
+    margin-top: 20px;
 }
 
 .wide-input {

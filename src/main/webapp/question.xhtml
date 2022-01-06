@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:body>
+        <ui:composition template="/WEB-INF/facelets/template.xhtml">
+            <ui:param name="page" value="question" />
+            <ui:param name="authorized" value="#{user.authenticated and user.id == siteController.site.ownerId}"/>
+
+            <ui:define name="title">
+                <c:choose>
+                    <c:when test="#{!dashboard.operational}">
+                        Malfunction
+                    </c:when>
+                    <c:when test="#{user.authenticated and questionController.question == null}">
+                        Valuate - Question
+                    </c:when>
+                    <c:otherwise>
+                        Valuate - #{questionController.question.getAttribute('question')}
+                    </c:otherwise>
+                </c:choose>
+            </ui:define>
+
+            <ui:define name="page_icon"><i class="fa fa-fw fa-question"/></ui:define>
+
+            <ui:define name="regular_content">
+
+                <h:form id="questionsForm">
+                    <c:set var="question" value="#{questionController.question}"/>
+                    <p:panel header="#{question.getAttribute('question').value}" toggleable="true">
+                        <div class="row spaced-bottom">
+                            <div class="col-lg-6">
+                                <h:outputLabel value="Question identifier"/><br/>
+                                <p:inputText value="#{question.questionId}" styleClass="wide-input"/>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel for="createdDate" value="Created"/><br/>
+                                <h:outputText id="createdDate" value="#{siteController.site.created}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm"/>
+                                </h:outputText>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel for="modifiedDate" value="Modified"/><br/>
+                                <h:outputText id="modifiedDate" value="#{siteController.site.modified}">
+                                    <f:convertDateTime type="date" pattern="yyyy-MM-dd HH:mm"/>
+                                </h:outputText>
+                            </div>
+                        </div>
+
+                        <div class="row spaced-bottom">
+                            <div class="col-lg-6">
+                                <h:outputLabel value="Question text"/><br/>
+                                <p:inputTextarea value="#{question.getAttribute('question').value}" styleClass="wide-input"/>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel for="updateByFeedback" value="Update by feedback"/><br/>
+                                <p:selectBooleanButton id="updateByFeedback" value="#{question.updateBySnippet}" styleClass="spaced-bottom"
+                                                       offLabel="Disabled" onLabel="Enabled"
+                                                       onIcon="fa fa-fw fa-toggle-on" offIcon="fa fa-fw fa-toggle-off">
+                                    <p:ajax event="change" update="@form"/>
+                                </p:selectBooleanButton>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel for="deleteQuestion" value="Delete question"/><br/>
+                                <p:commandLink id="deleteQuestion" action="#{questionController.deleteCurrentQuestion()}">
+                                    <span class="fa fa-2x fa-trash"/>
+                                    <p:confirm header="Confirm deletion" message="Do you want to delete #{question.getAttribute('question')}?" icon="fa fa-trash"/>
+                                </p:commandLink>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                                </p:confirmDialog>
+                            </div>
+                        </div>
+
+                        <div class="row spaced-bottom">
+                            <div class="col-lg-12">
+                                <h:outputLabel value="Snippet title"/><br/>
+                                <p:inputText value="#{question.getAttribute('title').value}" styleClass="wide-input"/>
+                            </div>
+                        </div>
+
+                        <div class="row spaced-bottom">
+                            <div class="col-lg-3">
+                                <h:outputLabel value="Collapsed Valuate window"/><br/>
+                                <p:selectOneMenu value="#{question.getAttribute('collapsed').value}" styleClass="wide-input">
+                                    <f:selectItem itemLabel="Non collapsible" itemValue="noncollapsible"/>
+                                    <f:selectItem itemLabel="Collapsible" itemValue="collapsible"/>
+                                    <f:selectItem itemLabel="Collapsed" itemValue="collapsed"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel value="Emoji set"/><br/>
+                                <p:selectOneMenu value="#{question.getAttribute('emoji').value}" styleClass="wide-input">
+                                    <f:selectItem itemLabel="Black and white" itemValue="bw"/>
+                                    <f:selectItem itemLabel="Classic" itemValue="classic"/>
+                                    <f:selectItem itemLabel="Soyjak" itemValue="soyjak"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel value="Leftmost value"/><br/>
+                                <p:inputText value="#{question.getAttribute('lowest').value}"/>
+                            </div>
+                            <div class="col-lg-3">
+                                <h:outputLabel value="Rightmost value"/><br/>
+                                <p:inputText value="#{question.getAttribute('highest').value}"/>
+                            </div>
+                        </div>
+
+                        <div class="row spaced-bottom">
+                            <div class="col-lg-6">
+                                <h:outputLabel value="User's branding-logo"/><br/>
+                                <p:inputText value="#{question.getAttribute('user-logo').value}" styleClass="wide-input"/>
+                            </div>
+                            <div class="col-lg-6">
+                                <h:outputLabel value="User's branding-link"/><br/>
+                                <p:inputText value="#{question.getAttribute('user-link').value}" styleClass="wide-input"/>
+                            </div>
+                        </div>
+
+                        <p:commandButton icon="fa fa-fw fa-save" value="Update Question" action="#{question.updateAttributes()}" update="@form"/>
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <pre>#{question.snippet}</pre>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-10">
+                                <p:link outcome="site">
+                                    <f:param name="site_id" value="#{question.siteId}"/>
+                                    Back to the site
+                                </p:link>
+                            </div>
+                            <div class="col-lg-2">
+                                <p:link outcome="report">
+                                    <f:param name="site_id" value="#{question.questionId}"/>
+                                    <f:param name="question_id" value="#{question.questionId}"/>
+                                    View Report</p:link>
+                            </div>
+                        </div>
+                    </p:panel>
+                </h:form>
+
+            </ui:define>
+
+            <ui:define name="not_authorized">
+                <h3>Access Denied!</h3>
+            </ui:define>
+
+            <ui:define name="malfunction">
+                <h3>Malfunction!</h3>
+            </ui:define>
+
+        </ui:composition>
+    </h:body>
+</html>
+

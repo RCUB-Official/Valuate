@@ -16,6 +16,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.lang3.RandomStringUtils;
 
 @ManagedBean(name = "user", eager = true)
 @SessionScoped
@@ -44,6 +45,10 @@ public class User implements Serializable {
 
     public User() {
         reset();
+    }
+
+    public void givenUsingApache_whenGeneratingRandomAlphabeticString_thenCorrect() {
+        String generatedString = RandomStringUtils.randomAlphabetic(10);
     }
 
     private void auxiliaryAuthentication() {

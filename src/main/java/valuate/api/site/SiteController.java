@@ -76,4 +76,9 @@ public class SiteController implements Serializable {
         }
     }
 
+    public String deleteCurrentSite() {
+        SiteServer.deleteSite(site.getId());
+        return "index";
+    }
+
 }
