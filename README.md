@@ -1,5 +1,6 @@
 ## About Valuate
-An unfinished web application for receiving feedbacks for various web sites, by their users (valuators), using provided code snippets. 
+An unfinished web application for receiving feedbacks for various web sites, by their users (valuators), using provided code snippets.
+I solved cross-origin resource sharing issues by setting the "Access-Control-Allow-Origin" header in the ScriptServer.java servlet which delivers the JavaScript, inspired by Facebook SDK code snippet for Facebook comment sections on other (non-Facebook) sites.
 
 ## Getting started
 
@@ -11,13 +12,19 @@ mvn package
 
 ## Configuration
 Enter your database credientals and Valuate server url in configuration.properties file
+```
 ./src/main/resources/config/configuration.properties
+```
 
 Encode your password in hex(SHA-512) and save it in auxiliary-auth.xml fajl. These user accounts will be automatically inserted into the database as administrators, upon their first login.
+```
 ./src/main/resources/config/auxiliary-auth.xml
+```
 
 Both above mentioned configuration files can be overriden by specifying the absolute path to their respective override files (RestlessFramework feature), in overrides.properties file. If the overriden file is properties-type, then the override should contain only those specific property lines that should be overriden (non-overriden lines will have their values from the WAR).
-/src/main/resources/config/overrides.properties
+```
+./src/main/resources/config/overrides.properties
+```
 
 Before deploying the WAR file, make sure you have made the database and initialized it with the valuate.sql script.
 
