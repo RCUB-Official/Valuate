@@ -1,47 +1,24 @@
-package valuate.api.site;
+package valuate.api.site.question;
 
+import valuate.api.attribute.Attribute;
 import framework.database.ConnectionPool;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import valuate.api.attribute.AttributeServer;
 
-class QuestionServer {
+public class QuestionServer {
 
     private static final Logger LOG = Logger.getLogger(QuestionServer.class.getName());
 
-    private static Map<String, Attribute> getSnippetAttributes(Connection connection, long siteId, String questionId) throws SQLException {
-        Map<String, Attribute> attributes = new HashMap<>();
-
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM question_attribute WHERE site_id=? AND question_id=?");
-        stmt.setLong(1, siteId);
-        stmt.setString(2, questionId);
-
-        ResultSet result = stmt.executeQuery();
-        while (result.next()) {
-            attributes.put(result.getString("attribute_field_id"), new Attribute(result.getString("attribute_field_id"), result.getString("attribute_value")));
-        }
-
-        stmt = connection.prepareStatement("SELECT * FROM attribute_field WHERE in_snippet_editor");
-        result = stmt.executeQuery();
-
-        while (result.next()) {
-            if (!attributes.containsKey(result.getString("attribute_field_id"))) {
-                attributes.put(result.getString("attribute_field_id"), new Attribute(result.getString("attribute_field_id"), result.getString("default_value") != null ? result.getString("default_value") : ""));
-            }
-        }
-
-        return attributes;
-    }
-
-    static Question addQuestion(long siteId, String questionId, String questionText) {
+    static Question addQuestion(long siteId, String questionId, String questionText) {  // Add by user, manually
         Question question = null;
 
         ConnectionPool pool = ConnectionPool.getInstance();
@@ -65,7 +42,8 @@ class QuestionServer {
 
             connection.commit();
 
-            question = new Question(siteId, questionId, false, "", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()), getSnippetAttributes(connection, siteId, questionId));
+            question = new Question(siteId, questionId, false, "", new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()),
+                    AttributeServer.getSnippetAttributes(connection, siteId, questionId));
         } catch (SQLException | InterruptedException ex) {
             if (connection != null) {
                 try {
@@ -95,7 +73,7 @@ class QuestionServer {
 
             while (result.next()) {
                 list.add(new Question(siteId, result.getString("question_id"), result.getBoolean("lock"), result.getString("user_note"), new Date(result.getTimestamp("created").getTime()),
-                        new Date(result.getTimestamp("modified").getTime()), getSnippetAttributes(connection, siteId, result.getString("question_id"))));
+                        new Date(result.getTimestamp("modified").getTime()), AttributeServer.getSnippetAttributes(connection, siteId, result.getString("question_id"))));
             }
         } catch (SQLException | InterruptedException ex) {
             LOG.log(Level.SEVERE, null, ex);
@@ -106,7 +84,7 @@ class QuestionServer {
         return list;
     }
 
-    static Question getQuestion(long siteId, String questionId) {
+    public static Question getQuestion(long siteId, String questionId) {
         Question question = null;
 
         ConnectionPool pool = ConnectionPool.getInstance();
@@ -121,7 +99,7 @@ class QuestionServer {
 
             if (result.next()) {
                 question = new Question(siteId, result.getString("question_id"), result.getBoolean("lock"), result.getString("user_note"), new Date(result.getTimestamp("created").getTime()),
-                        new Date(result.getTimestamp("modified").getTime()), getSnippetAttributes(connection, siteId, result.getString("question_id")));
+                        new Date(result.getTimestamp("modified").getTime()), AttributeServer.getSnippetAttributes(connection, siteId, result.getString("question_id")));
             }
 
         } catch (SQLException | InterruptedException ex) {
@@ -131,6 +109,27 @@ class QuestionServer {
         }
 
         return question;
+    }
+
+    public static void updateQuestionByFeedback(long siteId, String questionId, Map<String, Attribute> attributes) {
+        Question question = getQuestion(siteId, questionId);
+        if (question.isUpdateBySnippet()) {
+            boolean update = false; // Assume nothing changed.
+            for (String key : attributes.keySet()) {    // Iterating through feedback's attributes.
+                Attribute current = question.getAttribute(key);
+                if (current != null) {  // Check every attribute of the current question.
+                    if (current.getValue().equals(attributes.get(key).getValue())) {
+                        update = true;
+                        LOG.log(Level.INFO, "Attribute {0} of the question ({1}, \"{2}\") differs. Updating now.", new Object[]{key, siteId, questionId});
+                        break;
+                    }
+                }
+            }
+            if (update) {
+                // Lock is false, otherwise this wouldn't happen.
+                updateQuestion(siteId, questionId, questionId, false, question.getUserNote(), attributes);
+            }
+        }
     }
 
     static void updateQuestion(long siteId, String oldQuestionId, String questionId, boolean lock, String userNote, Map<String, Attribute> attributes) {
@@ -157,7 +156,7 @@ class QuestionServer {
                             + "VALUES(?, ?, ?, ?) ON CONFLICT (site_id, question_id, attribute_field_id) DO UPDATE SET attribute_value=?");  // Upsert
                     stmt.setLong(1, siteId);
                     stmt.setString(2, questionId);
-                    stmt.setString(3, attribute.getId());
+                    stmt.setString(3, attribute.getFieldId());
                     stmt.setString(4, attribute.getValue());
                     stmt.setString(5, attribute.getValue());
                     stmt.executeUpdate();
@@ -166,7 +165,7 @@ class QuestionServer {
                             + "WHERE site_id=? AND question_id=? AND attribute_field_id=?");
                     stmt.setLong(1, siteId);
                     stmt.setString(2, questionId);
-                    stmt.setString(3, attribute.getId());
+                    stmt.setString(3, attribute.getFieldId());
                     stmt.executeUpdate();
                 }
             }

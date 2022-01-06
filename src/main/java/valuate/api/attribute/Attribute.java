@@ -1,24 +1,24 @@
-package valuate.api.site;
+package valuate.api.attribute;
 
 import java.io.Serializable;
 
 public class Attribute implements Serializable {
 
-    private final String id;
+    private final String fieldId;
     private String value;
 
-    Attribute(String id, String value) {
-        this.id = id;
+    public Attribute(String fieldId, String value) {
+        this.fieldId = fieldId;
         this.value = value;
     }
 
-    Attribute(String id) {
-        this.id = id;
+    public Attribute(String id) {
+        this.fieldId = id;
         this.value = null;
     }
 
-    public String getId() {
-        return id;
+    public String getFieldId() {
+        return fieldId;
     }
 
     public String getValue() {
@@ -38,7 +38,7 @@ public class Attribute implements Serializable {
         if (!isEmpty()) {
             return value;
         } else {
-            return id;
+            return fieldId;
         }
     }
 

@@ -1,5 +1,6 @@
-package valuate.api.site;
+package valuate.api.site.question;
 
+import valuate.api.attribute.Attribute;
 import framework.settings.ValuateSettings;
 import framework.utilities.Utilities;
 import java.io.Serializable;
@@ -7,6 +8,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import valuate.api.attribute.AttributeField;
+import valuate.api.attribute.AttributeServer;
+import valuate.api.site.SiteController;
 
 public class Question implements Serializable {
 
@@ -52,8 +56,8 @@ public class Question implements Serializable {
         return !lock;
     }
 
-    public void setUpdateBySnippet(boolean lock) {
-        this.lock = !lock;
+    public void setUpdateBySnippet(boolean updateBySnippet) {
+        this.lock = !updateBySnippet;
         QuestionServer.setQuestionLock(siteId, questionId, lock);
     }
 
@@ -95,19 +99,24 @@ public class Question implements Serializable {
 
     public String getSnippet() {
         ValuateSettings settings = ValuateSettings.getInstance();
-        String snippet = "<script async defer src=\"" + settings.getUrl() + "/script?for=" + questionId + "\" onLoad=\"valuateLoad()\"></script>"
+        String snippet = "<script async defer src=\"" + settings.getUrl() + "/script?for=" + siteId + "\" onLoad=\"valuateLoad()\"></script>"
                 + "\n<valuate id=\"" + questionId + "\"";
 
         int breakCounter = 1;
         for (String key : attributes.keySet()) {
-            Attribute attribute = attributes.get(key);
-            if (!attribute.isEmpty() && !attribute.getId().equals(settings.getQuestionAttributeFieldId())) {
-                if (breakCounter++ % 4 == 0) {
-                    snippet += "\n";
-                } else {
-                    snippet += " ";
+            AttributeField field = AttributeServer.getAttributeField(key);
+            if (field != null) {
+                if (field.isInSnippetEditor()) {
+                    Attribute attribute = attributes.get(key);
+                    if (!attribute.isEmpty() && !attribute.getFieldId().equals(settings.getQuestionAttributeFieldId())) {
+                        if (breakCounter++ % 4 == 0) {
+                            snippet += "\n";
+                        } else {
+                            snippet += " ";
+                        }
+                        snippet += attribute.getFieldId() + "=\"" + attribute.getValue() + "\"";
+                    }
                 }
-                snippet += attribute.getId() + "=\"" + attribute.getValue() + "\"";
             }
         }
         snippet += ">" + attributes.get(settings.getQuestionAttributeFieldId()) + "</valuate>";

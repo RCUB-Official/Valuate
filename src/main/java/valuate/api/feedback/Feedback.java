@@ -3,6 +3,7 @@ package valuate.api.feedback;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import valuate.api.attribute.Attribute;
 
 public class Feedback {
 
@@ -14,10 +15,10 @@ public class Feedback {
     private final String valuatorIP;
     private final String valuatorUserAgent;
 
-    private final Map<String, String> attributes;
+    private final Map<String, Attribute> attributes;
 
     // Made by the Endpoint servlet
-    public Feedback(long originId, String questionId, String valuatorIP, String valuatorUserAgent, Map attributes) {
+    public Feedback(long originId, String questionId, String valuatorIP, String valuatorUserAgent, Map<String, Attribute> attributes) {
         this.feedbackId = -1;
         this.originId = originId;
         this.questionId = questionId;
@@ -28,7 +29,7 @@ public class Feedback {
     }
 
     // Read from the database
-    public Feedback(long feedbackId, long originId, String questionId, Date received, String valuatorIP, String valuatorUserAgent, Map attributes) {
+    public Feedback(long feedbackId, long originId, String questionId, Date received, String valuatorIP, String valuatorUserAgent, Map<String, Attribute> attributes) {
         this.feedbackId = feedbackId;
         this.originId = originId;
         this.questionId = questionId;
@@ -62,7 +63,7 @@ public class Feedback {
         return valuatorUserAgent;
     }
 
-    public Map<String, String> getAttributes() {
+    public Map<String, Attribute> getAttributes() {
         return attributes;
     }
 

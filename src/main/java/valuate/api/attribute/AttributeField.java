@@ -1,4 +1,4 @@
-package valuate.api.feedback;
+package valuate.api.attribute;
 
 public final class AttributeField {
 

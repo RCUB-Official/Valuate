@@ -1,4 +1,4 @@
-package valuate.api.site;
+package valuate.api.site.question;
 
 import framework.utilities.HashCalculator;
 import framework.utilities.Utilities;
@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import valuate.api.site.SiteController;
 
 @ManagedBean(name = "questionController", eager = true)
 @ViewScoped
@@ -66,6 +67,11 @@ public class QuestionController implements Serializable {
         QuestionServer.addQuestion(siteId, questionId, questionText);
         questionId = "";
         questionText = "";
+
+        SiteController sc = (SiteController) Utilities.getObject("#{siteController}");
+        if (sc != null) {
+            sc.reloadQuestions();
+        }
     }
 
     public String deleteCurrentQuestion() {

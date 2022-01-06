@@ -81,4 +81,9 @@ public class SiteController implements Serializable {
         return "index";
     }
 
+    public void reloadQuestions() {
+        if (site != null) {
+            site.reloadQuestions();
+        }
+    }
 }
