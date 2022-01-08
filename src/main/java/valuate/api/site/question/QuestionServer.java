@@ -196,7 +196,7 @@ public class QuestionServer {
         }
     }
 
-    public static void updateQuestionByFeedback(Feedback feedback) {
+    public static void updateQuestionByFeedback(Feedback feedback) {    // TODO: make sure you updated the modified timestamp in valuate_question table.
         long siteId = feedback.getOriginId();
         String questionId = feedback.getQuestionId();
 

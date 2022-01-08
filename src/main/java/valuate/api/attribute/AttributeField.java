@@ -1,6 +1,8 @@
 package valuate.api.attribute;
 
-public final class AttributeField {
+import framework.cache.Cacheable;
+
+public final class AttributeField implements Cacheable {
 
     private final String fieldId;
     private boolean inSnippetEditor;
@@ -18,7 +20,8 @@ public final class AttributeField {
         this.adminNote = adminNote;
     }
 
-    public String getFieldId() {
+    @Override
+    public String getId() {
         return fieldId;
     }
 

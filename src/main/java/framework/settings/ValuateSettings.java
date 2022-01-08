@@ -17,6 +17,8 @@ public final class ValuateSettings extends Settings {
     private String questionAttributeFieldId;
     private String questionIdAutoPrefix;
 
+    private int attributeFieldCacheSize;
+
     private ValuateSettings() {
         super("valuate", "/config/configuration.properties", "Valuate Settings", true);
     }
@@ -32,6 +34,7 @@ public final class ValuateSettings extends Settings {
         url = handler.getParam("url");
         questionAttributeFieldId = handler.getParam("questionAttributeFieldId");
         questionIdAutoPrefix = handler.getParam("questionIdAutoPrefix");
+        attributeFieldCacheSize = Integer.parseInt(handler.getParam("attributeFieldCacheSize"));
 
         // Loading client-script
         try (InputStream templateIstream = ValuateSettings.class.getResourceAsStream(scriptPath)) {
@@ -63,6 +66,10 @@ public final class ValuateSettings extends Settings {
 
     public String getQuestionIdAutoPrefix() {
         return questionIdAutoPrefix;
+    }
+
+    public int getAttributeFieldCacheSize() {
+        return attributeFieldCacheSize;
     }
 
 }

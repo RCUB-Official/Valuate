@@ -53,9 +53,9 @@ public class Endpoint extends HttpServlet {
 
             for (AttributeField af : feedbackAttributeFields) {
                 try {
-                    String attributeValue = (String) po.get(af.getFieldId());
+                    String attributeValue = (String) po.get(af.getId());
                     if (attributeValue != null) {
-                        attributes.put(af.getFieldId(), new Attribute(af.getFieldId(), attributeValue));
+                        attributes.put(af.getId(), new Attribute(af.getId(), attributeValue));
                     }
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE, null, ex);

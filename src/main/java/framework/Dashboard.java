@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import valuate.api.attribute.AttributeServer;
 
 @ManagedBean(name = "dashboard", eager = true)
 @ApplicationScoped
@@ -34,6 +35,7 @@ public final class Dashboard implements Serializable {
         monitorables.add(DatabaseSettings.getInstance());
         monitorables.add(ConnectionPool.getInstance());
         monitorables.add(ValuateSettings.getInstance());
+        monitorables.add(AttributeServer.getInstance());
     }
 
     @PostConstruct
