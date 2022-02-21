@@ -1,6 +1,6 @@
 ## About Valuate
 An unfinished web application for receiving feedbacks for various web sites, by their users (valuators), using provided code snippets.
-I solved cross-origin resource sharing issues by setting the "Access-Control-Allow-Origin" header in the ScriptServer.java servlet which delivers the JavaScript, inspired by Facebook SDK code snippet for Facebook comment sections on other (non-Facebook) sites.
+Cross-origin resource sharing issues are solved by setting the "Access-Control-Allow-Origin" header in the ScriptServer.java servlet which delivers the JavaScript, inspired by Facebook SDK code snippet for Facebook comment sections on other (non-Facebook) sites.
 
 ## Getting started
 
@@ -34,3 +34,6 @@ Before deploying the WAR file, make sure you have made the database and initiali
 2. Implement report-view page instead of the mock one - use caching if it is too slow and use feedback received event to invalidate the cache.
 3. Implement an attribute field management page.
 4. Enforce additional anti-spam measures, e.g if site has anti-spam flag enabled, do not accept feedback unless the was a request for JavaScript from the same IP, some time ago...
+
+### Credits
+Up to 2022 Valuate was developed and hosted by [Vasilije Rajovic](https://github.com/RestlessDevil) on behalf of RCUB.
