@@ -36,4 +36,4 @@ Before deploying the WAR file, make sure you have made the database and initiali
 4. Enforce additional anti-spam measures, e.g if site has anti-spam flag enabled, do not accept feedback unless the was a request for JavaScript from the same IP, some time ago...
 
 ### Credits
-Up to 2022 Valuate was developed and hosted by [Vasilije Rajovic](https://github.com/RestlessDevil) on behalf of RCUB.
+Up to 2022 Valuate was developed and hosted by [Vasilije Rajović](https://github.com/RestlessDevil) on behalf of RCUB.
