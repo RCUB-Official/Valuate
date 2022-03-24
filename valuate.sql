@@ -14,7 +14,7 @@ CREATE TABLE valuate_user (
     email VARCHAR(70) UNIQUE NOT NULL,
     name VARCHAR(40) NOT NULL,
     password_hash VARCHAR(128),
-    password_salt VARCHAR(64),
+    password_salt VARCHAR(64) DEFAULT '',
     registered TIMESTAMP NOT NULL DEFAULT current_timestamp,
     last_login TIMESTAMP DEFAULT NULL,
     email_verified BOOLEAN NOT NULL DEFAULT FALSE,
